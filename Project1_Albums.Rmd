@@ -1,0 +1,183 @@
+---
+title: "Albums Analysis"
+author: "Dakshin Bharath"
+date: "2024-09-27"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+
+---
+
+```{r setup, include=FALSE, warnings=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(knitr)
+
+data = read.csv("C:\\Users\\daksh\\Downloads\\Project 1 SDS\\Project1_Albums.csv")
+
+```
+
+# Introduction
+
+### Dataset Description
+
+The Albums.csv dataset contains information about various music albums. This dataset was collected from multiple sources, including music streaming platforms, music charts, and industry reports. It includes details such as album names, artists, release years, genres, and popularity metrics.
+
+### Outcome Variable
+The outcome variable that I will be predicting is "spotify_popularity". This variable represents the popularity of an album on Spotify, typically measured by the number of streams, likes, or other engagement metrics.
+
+### Predictor Variables
+The three main predictor variables that I think might influence the outcome variables are:
+
+release_year (numeric): The year the album was released.
+
+genre (categorical): The genre of the album (e.g., pop, rock, hip-hop).
+
+weeks_on_billboard (numeric): The number of weeks the album spent on the Billboard charts.
+
+![](Rap.png)
+
+Picture shows Tha Carter III by Lil Wayne, the 209th album out of the top 500 ranked albums according to Rolling Stone in 2020
+
+# Outcome Variable Distribution
+
+```{r, echo = FALSE, warnings=FALSE}
+ggplot(data, aes(x = spotify_popularity)) +
+  geom_histogram(binwidth = 5, fill = "blue", color = "black") +
+  labs(title = "Distribution of Spotify Popularity",
+       x = "Spotify Popularity",
+       y = "Frequency")
+
+summary_stats <- data %>%
+  summarise(
+    mean = mean(spotify_popularity, na.rm = TRUE),
+    median = median(spotify_popularity, na.rm = TRUE),
+    sd = sd(spotify_popularity, na.rm = TRUE)
+  )
+# Display the summary statistics as a table
+kable(summary_stats, caption = "Summary Statistics of Spotify Popularity")
+
+#cat("The mean Spotify popularity is", mean_value, "\n"): Prints the text "The mean Spotify popularity is" followed by the value of mean_value. \n adds a newline to ensure the next output starts on a new line.
+
+mean_value <- summary_stats$mean
+median_value <- summary_stats$median
+sd_value <- summary_stats$sd
+
+cat("The mean Spotify popularity is", mean_value, "\n")
+cat("The median Spotify popularity is", median_value, "\n")
+cat("The standard deviation of Spotify popularity is", sd_value, "\n")
+
+
+```
+
+# Bivariate Analyses
+
+```{r, echo= FALSE, warnings=FALSE}
+
+library(ggplot2)
+ggplot(data, aes(x = release_year, y = spotify_popularity)) +
+  geom_point() +
+  labs(
+    title = "Relationship between Release Year and Spotify Popularity",
+    x = "Release Year",
+    y = "Spotify Popularity"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+cor.test(data$release_year, data$spotify_popularity)
+
+```
+
+According to the graph, the correlation is about 0.362, which is a very weak positive correlation. <span style="color:blue; font-size:14px">This means that there isn't really a big correlation between Release Year and Spotify Popularity.</span>
+
+
+```{r, echo= FALSE,warnings=FALSE}
+
+library(ggplot2)
+ggplot(data, aes(x = genre, y = spotify_popularity)) +
+  geom_boxplot() +
+  labs(
+    title = "Relationship between Genre and Spotify Popularity",
+    x = "Genre",
+    y = "Spotify Popularity"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  coord_flip()
+
+summary(aov(spotify_popularity ~ genre, data = data))
+
+
+
+```
+
+Based on the graph, there is a significant relationship between genre and Spotify popularity, suggesting that <span style="color:blue; font-size:14px">some genres are generally more popular than others on Spotify.</span>
+
+
+
+
+```{r, echo= FALSE, warnings=FALSE}
+
+ggplot(data, aes(x = weeks_on_billboard, y = spotify_popularity)) +
+  geom_point() +
+  labs(title = "Relationship between Weeks on Billboard and Spotify Popularity",
+       x = "Weeks on Billboard",
+       y = "Spotify Popularity")
+
+cor.test(data$weeks_on_billboard, data$spotify_popularity)
+
+```
+
+The analysis demonstrates a statistically significant, moderate positive relationship between the number of weeks a song spends on the Billboard charts and its Spotify popularity, suggesting that <span style="color:blue; font-size:14px">extended Billboard chart performance is associated with higher Spotify popularity, though other factors may also influence this relationship.</span>
+
+# Choice Element
+
+I used multiple choice elements in my Analysis.
+
+## 1. Text Formatting:
+
+Example: "<span style="color:blue; font-size:14px">some genres are generally more popular than others on Spotify.</span>"
+
+## 2. Table of Contents
+
+Attached the table of contents to the beginning of the code. 
+
+## 3. New Variable
+
+I created new variables when I defined `"mean_value" as "summary_stats$mean" "median_value" as "summary_stats$median"` and so on. 
+
+## 4. Subset Data
+I don't have a subset in my code, but I could add one in like this:
+
+```{r, echo=FALSE, warnings=FALSE}
+subset_data <- data %>% filter(genre == "Pop")
+subset_data
+```
+
+## 5. Multivariable Plot
+I don't have a Multivariable Plot, but one would look like this. 
+
+```{r, echo=FALSE, warnings=FALSE}
+ggplot(data, aes(x = release_year, y = spotify_popularity, color = genre)) +
+  geom_point() +
+  labs(title = "Multivariate Plot: Release Year, Spotify Popularity, and Genre",
+       x = "Release Year",
+       y = "Spotify Popularity")
+
+```
+
+# Conclusion
+
+The analysis of the Albums.csv dataset revealed several key insights. Firstly, there is a very weak positive correlation between the release year and Spotify popularity, indicating that the release year does not significantly impact an album's popularity on Spotify. Secondly, the genre of an album has a significant relationship with its Spotify popularity, suggesting that some genres are generally more popular than others on the platform. Lastly, there is a moderate positive relationship between the number of weeks an album spends on the Billboard charts and its Spotify popularity, indicating that extended Billboard chart performance is associated with higher Spotify popularity.
+
+Future research could explore additional predictor variables, such as social media engagement or marketing efforts, to further understand the factors influencing an album's popularity on Spotify. Additionally, examining the impact of collaborations between artists and the role of music videos could provide valuable insights.
+
+
+Sources: 
+
+1. Lil Wayne Weezy Tha Carter III Art Wall Indoor Room Poster - POSTER 20x30. (n.d.). Ebay. https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.ebay.com%2Fitm%2F144307287199&psig=AOvVaw0kkVQ2Tb8fVu1tdBDmiHPt&ust=1727504780067000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCKj41_e-4ogDFQAAAAAdAAAAABAY
+
+2. Jiang, J., Ponnada, A., Li, A., Lacker, B., & Way, S. F. (2024). A Genre-Based Analysis of New Music Streaming at Scale. A Genre-Based Analysis of New Music Streaming at Scale. https://doi.org/10.1145/3614419.3644002
+
